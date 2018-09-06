@@ -1,0 +1,23 @@
+#Create COM object  
+Scapi = win32.Dispatch( 'AllFusionERwin.SCAPI' )  
+#Build a connection to the model in the persistent device  
+scPUnit = scapi.PersistenceUnits.Add(filename, "RDO=yes" )  
+#Create a connection to access model data in memory  
+scSession = scapi.Sessions.Add()  
+scSession.Open(scPUnit, 0 , 0 )  
+#交易控制  
+scTranId = scSession.BeginTransaction()  
+#Get all Entity model objects  
+scMObjects = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, 'Entity' , 1 )  
+For  scObj  in  scMObjects:  
+    #取The value of the Definition property  
+    scDefineName = scObj.Properties( 'Definition' ).Value  
+    #object name assignment  
+    scObj.Properties( 'Name' ).Value = scDefineName   
+    #Get all the Attribute objects of the Entity  
+    scAttrObjects = scSession.ModelObjects.Collect(scObj, 'Attribute' , 1 )  
+    #Attribute name modification is similar to the above  
+    ...  
+scSession.CommitTransaction(scTranId)  
+#Save as a new file  
+scPUnit.Save(newfilename, 'OVF=yes' ) 
